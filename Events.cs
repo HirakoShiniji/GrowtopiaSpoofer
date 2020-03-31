@@ -45,7 +45,7 @@ namespace GrowtopiaSpoofer
             var baseadd = gt.MainModule.BaseAddress.ToInt64();
             client = baseadd;
             uint kek;
-            Console.WriteLine("[GrowtopiaSpoofer] GT Memory Size " + gt.MainModule.ModuleMemorySize);
+        
             VirtualProtectEx(handler, client + 0x0, gt.MainModule.ModuleMemorySize, PAGE_READWRITE,
              out kek);
             VirtualAllocEx(handler, client + Address,enable.Length,0x40, 0x40);
@@ -60,7 +60,10 @@ namespace GrowtopiaSpoofer
             var baseadd = gt.MainModule.BaseAddress.ToInt64();
             client = baseadd;
             byte[] game_version = new byte[50];
-            ReadProcessMemory(handler, 0x7FF7CA98A240, game_version, 50);
+            uint kek;
+            VirtualProtectEx(handler, client + 0x44A240, 50, PAGE_READWRITE,
+           out kek);
+            ReadProcessMemory(handler, 0x44A242, game_version, 50);
             float gttt = System.BitConverter.ToSingle(game_version, 0);
             Console.WriteLine("[CLIENT] game_version|" + gttt);
             version = gttt.ToString();
@@ -147,13 +150,82 @@ namespace GrowtopiaSpoofer
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("[GrowtopiaSpoofer] Successfully spoofed your game version sending to server...");
-                Console.ForegroundColor = ConsoleColor.White;
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine("[GrowtopiaSpoofer] event|OnSendToServer");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                wait_commands = true;
+         
             }
+        
+
+        }
+        public static bool wait_commands = false;
+        public static bool wait_rO = false;
+        public static void waitRealCommand()
+        {
+            Process gt = Process.GetProcessesByName("Growtopia")[0];
+            IntPtr handler = OpenProcess(0x0FFFFF, true, gt.Id);
+            var baseadd = gt.MainModule.BaseAddress.ToInt64();
+            while (wait_rO == true)
+            {
+                client = baseadd;
+                byte[] ocm = new byte[20];
+
+                ReadProcessMemory(handler, 0x5447C8, ocm, 20);
+
+                if (ASCIIEncoding.ASCII.GetString(ocm).Contains("/goblins"))
+                {
+                    WriteProcessMemory(handler, client + 0x2ADC41, new byte[] { 0x74 }, 1);
+                }
+                if (ASCIIEncoding.ASCII.GetString(ocm).Contains("/nick"))
+                {
+                    String name = ASCIIEncoding.ASCII.GetString(ocm).Replace("/nick","");
+
+                    WriteProcessMemory(handler, client + 0x46D828, ASCIIEncoding.ASCII.GetBytes(name), ASCIIEncoding.ASCII.GetBytes(name).Length);
+                    WriteProcessMemory(handler, client + 0x2ADC41, new byte[] { 0x74 }, 1);
+                 
+                    }
+                if (ASCIIEncoding.ASCII.GetString(ocm).Contains("/set"))
+                {
+                    WriteProcessMemory(handler, client + 0x2ADC41, new byte[] { 0x74 }, 1);
+                    Console.WriteLine("[GrowtopiaSpoofer] your nickname has been changed!");
+                    wait_rO = false;
+                    wait_commands = true;
+                    GetCommands();
+                }
+            }
+
+        }
+        public static void GetCommands()
+        {
+            
+            Process gt = Process.GetProcessesByName("Growtopia")[0];
+            IntPtr handler = OpenProcess(0x0FFFFF, true, gt.Id);
+            var baseadd = gt.MainModule.BaseAddress.ToInt64();
+            while (wait_commands == true)
+            {
+            
+                client = baseadd;
+                byte[] ocm = new byte[20];
+   
+                ReadProcessMemory(handler, 0x5447C8, ocm, 20);
+               
+                if (ASCIIEncoding.ASCII.GetString(ocm).Contains("/spoofer"))
+                {
+                    Console.WriteLine("/spoofer commands: /legens /goblins");
+                    wait_commands = false;
+                    wait_rO = true;
+                    waitRealCommand();
+
+                }
+             
+            }
+               
+             
+            }
+          
 
 
         }
     }
-}
 
