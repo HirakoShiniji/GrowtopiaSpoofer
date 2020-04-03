@@ -30,7 +30,7 @@ namespace GrowtopiaSpoofer
           int dwSize, uint flNewProtect, out uint lpflOldProtect);
         static long client = 0;
 
-        public static string version = "";
+        public static string version = "3.32";
         public const  int
        PAGE_READWRITE = 0x40,
     PROCESS_VM_OPERATION = 0x0008,
@@ -124,10 +124,8 @@ namespace GrowtopiaSpoofer
         public static void GetLocalVersion()
         {
             //to be implemented!
+            Console.WriteLine("[HTTP] got server data request!");
             Console.WriteLine("[GrowtopiaSpoofer] Spoofing user info...");
-            Console.WriteLine("[CLIENT] cbits|");
-            Console.WriteLine("[CLIENT] uid|");
-            Console.WriteLine("[CLIENT] netid|");
             if (System.IO.File.ReadAllText(@"C:\Users\" + Environment.UserName + @"\AppData\Local\Growtopia\Growtopia.exe").Contains("3.02"))
             {
                 oldversion = "3,02";
@@ -147,18 +145,30 @@ namespace GrowtopiaSpoofer
                 //3.022 >> 3.32 Long term Spoof :)
                 
                 Patch(0x44B9A0, new byte[] { 0xE1, 0x7A, 0x54, 0x40, 0x2C, 0x65, 0x57, 0x41, 0x1C, 0x7C, 0x9A, 0x41, 0x96, 0xA1, 0x9A, 0x41, 0xD3, 0xCD, 0xDC, 0x41, 0x6B, 0xDA, 0x0F, 0x42, 0xCA, 0x54, 0x12, 0x42, 0x00, 0x00, 0x34, 0x42, 0xF0, 0x67, 0x36, 0x42, 0x01, 0x5E, 0x58, 0x42, 0x00, 0x00, 0x70, 0x42, 0x00, 0x00, 0x90, 0x42, 0x6D, 0x65 }, new byte[] { 0xF3, 0x0F, 0x10, 0x0D, 0x18, 0xDD, 0x3A, 0x00 });
-            
+                Patch(0x44B6B8, new byte[] { 0x86, 0x51, 0x46, 0x51, 0x50 }, new byte[] { 0xF3});
 
-                Console.WriteLine("[GrowtopiaSpoofer] GT Version detected 3.022");
+                Console.WriteLine("[GrowtopiaSpoofer] game_version|3.022");
+            }
+            if (System.IO.File.ReadAllText(@"C:\Users\" + Environment.UserName + @"\AppData\Local\Growtopia\Growtopia.exe").Contains("3.32"))
+            {
+                Patch(0x1EAF80, new byte[] { 0x74 }, new byte[] { 0x74 });
+
+                //3.32 >> 3.33 Long term Spoof :)
+
+                Patch(0x45EDFC, new byte[] { 0xE1, 0x7A, 0x54, 0x40, 0x2C, 0x65, 0x57, 0x41, 0x1C, 0x7C, 0x9A, 0x41, 0x96, 0xA1, 0x9A, 0x41, 0xD3, 0xCD, 0xDC, 0x41, 0x6B, 0xDA, 0x0F, 0x42, 0xCA, 0x54, 0x12, 0x42, 0x00, 0x00, 0x34, 0x42, 0xF0, 0x67, 0x36, 0x42, 0x01, 0x5E, 0x58, 0x42, 0x00, 0x00, 0x70, 0x42, 0x00, 0x00, 0x90, 0x42, 0x6D, 0x66 }, new byte[] { 0xF3, 0x0F, 0x10, 0x0D, 0x18, 0xDD, 0x3A, 0x00 });
+                
+
+                Console.WriteLine("[GrowtopiaSpoofer] game_version|3.32");
             }
             if (Events.version == Events.oldversion)
             {
-                Console.WriteLine("[GrowtopiaSpoofer] sad to tell but failed on spoofing the version :(");
+                throw new Exception("error version spoofing?");
             }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.WriteLine("[GrowtopiaSpoofer] event|OnSendToServer");
+                aapbypass();
                 Console.ForegroundColor = ConsoleColor.Gray;
                 wait_commands = true;
          
@@ -166,6 +176,27 @@ namespace GrowtopiaSpoofer
         
 
         }
+        public static int aapbypass()
+        {
+        
+            string mac = "22"; //fake mac address to set
+            string minimal_mac = mac.Replace("-", "");
+            long func_mac_address = 0x476894; //dont touch this address. unless if you know what you are doing :)
+            Patch(func_mac_address, ASCIIEncoding.ASCII.GetBytes(minimal_mac), null);
+            byte[] platformID = new byte[] { 0x34 }; //android
+            long platformID_address = 0x476873;
+            Patch(platformID_address, platformID, null);
+            long reconnect = 0x4768A2;
+            byte[] reconnect_val = new byte[] { 0x31 };
+            Patch(reconnect, reconnect_val, null);
+            
+      
+            
+
+
+            return 0;
+        }
+
         public static bool wait_commands = false;
         public static bool wait_rO = false;
         public static void waitRealCommand()
@@ -223,7 +254,6 @@ namespace GrowtopiaSpoofer
                     wait_commands = false;
                     wait_rO = true;
                     waitRealCommand();
-                    //disabled for now
 
                 }
              
