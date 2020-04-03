@@ -48,7 +48,7 @@ namespace GrowtopiaSpoofer
 
 
             var buffer = System.Text.Encoding.UTF8.GetBytes(server_data);
-            Events.GetLocalVersion();
+            Events.Spoof();
 
 
             go = true;
@@ -58,7 +58,7 @@ namespace GrowtopiaSpoofer
             var output = response.OutputStream;
 
             output.Write(buffer, 0, buffer.Length);
-
+         
 
 
             output.Close();
@@ -67,7 +67,7 @@ namespace GrowtopiaSpoofer
             System.Threading.Thread.Sleep(2000);
 
             go = false;
-
+     
             Spoofer();
         }
 
