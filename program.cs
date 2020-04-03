@@ -14,6 +14,7 @@ namespace GrowtopiaSpoofer
         static void Main(string[] args)
         {
             Console.WriteLine("GrowtopiaSpoofer by Hirako#4480"); Console.WriteLine("HTTP Server is running!");
+            Console.Title("GrowtopiaSpoofer by Hirako#4480");
          
             HTTP.gtfakeserver = new HttpListener();
             HTTP.gtfakeserver.Prefixes.Add(HTTP.url);
